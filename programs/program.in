@@ -1,3 +1,7 @@
-ldi ra, 10
-ldi rb, 10
-add ra, rb
+ldi ra, 1
+ldi rb, 1
+ldi rc, 2
+mov rb, rc
+add rc, ra
+mov ra, rb
+rjmp -3
