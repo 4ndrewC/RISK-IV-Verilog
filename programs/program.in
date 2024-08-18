@@ -1,0 +1,3 @@
+ldi ra, 10
+ldi rb, 10
+add ra, rb
