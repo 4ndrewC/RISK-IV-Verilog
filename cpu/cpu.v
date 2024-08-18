@@ -144,15 +144,15 @@ module cpu(
             check_wb <= 1'b0;
             if(reg_write_en) begin
                 reg_wb_tr <= 1'b1;
-                write_backs = write_backs + 1;
+                write_backs <= write_backs + 1;
             end
             if(mem_write_en) begin
                 mem_wb_tr <= 1'b1;
-                write_backs = write_backs + 1;
+                write_backs <= write_backs + 1;
             end
             if(flag_update_en) begin
                 flag_update_tr <= 1'b1;
-                write_backs = write_backs + 1;
+                write_backs <= write_backs + 1;
             end
         end
         if(reg_wb_tr) begin
