@@ -23,48 +23,33 @@ Execute split into three different stages
 */
 
 module execute(
-    opcode,
-    reg1_code,
-    reg2_code,
-    imm,
-    SREG_in,
-    SREG_out,
-    flag_update,
-    mem_write_val,
-    mem_write_addr,
-    reg_write_val,
-    reg_write_code,
-    mem_read_data,
-    reg1_input_data,
-    reg2_input_data,
-    PC_jump_loc,
-    PC_jump_inc,
-    jump,
-    rjump,
-    mem_wb,
-    reg_wb,
-    dne_tr,
-    clk
+    input [`OPSIZE-1:0] opcode,
+    input [2:0] reg1_code,
+    input [2:0] reg2_code,
+    input signed [`WORD-1:0] imm,
+    input [`WORD-1:0] SREG_in,
+    output reg [`WORD-1:0] SREG_out,
+    output reg flag_update,
+    output reg signed [`WORD-1:0] mem_write_val,
+    output reg [`WORD-1:0] mem_write_addr,
+    output reg signed [`WORD-1:0] reg_write_val,
+    output reg [2:0] reg_write_code,
+    input signed [`WORD-1:0] mem_read_data,
+    input signed [`WORD-1:0] reg1_input_data,
+    input signed [`WORD-1:0] reg2_input_data,
+    output reg [`WORD-1:0] PC_jump_loc,
+    output reg [`WORD-1:0] PC_jump_inc,
+    output reg jump,
+    output reg rjump,
+    output reg mem_wb,
+    output reg reg_wb,
+    input dne_tr,
+    input clk
 );
-
-    input clk, dne_tr;
-    input [`OPSIZE-1:0] opcode;
-    input [2:0] reg1_code, reg2_code;
-    input [`WORD-1:0] imm;
-    input [`WORD-1:0] mem_read_data;
-    input [`WORD-1:0] reg1_input_data, reg2_input_data;
-    input [`WORD-1:0] SREG_in;
-
-    output reg [`WORD-1:0] SREG_out;
-    output reg [`WORD-1:0] mem_write_val, reg_write_val, mem_write_addr, PC_jump_inc, PC_jump_loc;
-    output reg [2:0] reg_write_code;
-    output reg jump, rjump;
-    output reg mem_wb, reg_wb, flag_update;
 
     // alu variables
     reg has_imm;
     reg [`WORD-1:0] res;
-
 
     reg [`WORD-1:0] execution_cnt;
 
@@ -100,7 +85,7 @@ module execute(
 
                 if(res==0) SREG_out[`Zf] = 1'b1;
                 else SREG_out[`Zf] = 1'b0;
-                flag_update = 1'b1;
+                
 
                 if(opcode!=`CMP && opcode!=`CMPI) begin
                     reg_write_code = reg1_code;
@@ -112,7 +97,7 @@ module execute(
                 
                 if(has_imm) PC_jump_inc = 2;
                 else PC_jump_inc = 1;
-                
+                flag_update = 1'b1;
             end
             else if(opcode>=5'b10100) begin // flag modification instructions
                 case (opcode)
