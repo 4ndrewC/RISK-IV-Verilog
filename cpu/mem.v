@@ -11,26 +11,19 @@ What to query from memory per fetch?
 
 
 module mem(
-    re, 
-    we, 
-    data_in, 
-    data_out, 
-    instr,
-    read_addr,
-    write_addr, 
-    fetch_addr,
-    imm, 
-    fetch,
-    write_back_en,
-    clk
+    input re, 
+    input we, 
+    input signed [`WORD-1:0] data_in, 
+    output reg signed [`WORD-1:0] data_out, 
+    output reg [`WORD-1:0]instr,
+    input [`WORD-1:0] read_addr,
+    input [`WORD-1:0] write_addr, 
+    input [`WORD-1:0] fetch_addr,
+    output reg signed [`WORD-1:0] imm, 
+    input fetch,
+    input write_back_en,
+    input clk
 );
-
-    input re, we, clk, fetch, write_back_en;
-    input [`WORD-1:0] read_addr, write_addr, fetch_addr;
-    input signed [`WORD-1:0] data_in;
-
-    output reg [`WORD-1:0] data_out, imm;
-    output reg signed [`WORD-1:0] instr;
 
     reg signed [`WORD-1:0] memory [`MEMSIZE-1:0];
 
