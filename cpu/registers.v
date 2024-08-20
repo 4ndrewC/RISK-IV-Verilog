@@ -10,27 +10,21 @@ What to query from registers per fetch?
 */
 
 module registers(
-    re, 
-    we, 
-    reg1,
-    reg2,
-    reg_write_code,
-    data_in, 
-    data_out1, 
-    data_out2,
-    SREG_read,
-    SREG_write, 
-    get_reg_en,
-    reg_write_back,
-    flag_update,
-    clk
+    input re, 
+    input we, 
+    input [2:0] reg1,
+    input [2:0] reg2,
+    input [2:0] reg_write_code,
+    input signed [`WORD-1:0] data_in, 
+    output reg signed [`WORD-1:0] data_out1, 
+    output reg signed [`WORD-1:0] data_out2,
+    output reg signed [`WORD-1:0] SREG_read,
+    input signed [`WORD-1:0] SREG_write, 
+    input get_reg_en,
+    input reg_write_back,
+    input flag_update,
+    input clk
 );
-
-    input re, we, get_reg_en, clk, reg_write_back, flag_update;
-    input [2:0] reg1, reg2, reg_write_code;
-    input signed [`WORD-1:0] data_in, SREG_write;
-
-    output reg signed [`WORD-1:0] data_out1, data_out2, SREG_read;
 
     reg signed [`WORD-1:0] registers[`REGISTERS-1:0];
 
@@ -52,10 +46,10 @@ module registers(
             registers[reg_write_code] = data_in;
             $display("writing %16b into register %3b\n", data_in, reg_write_code);
         end
-        if(flag_update) begin
-            registers[`SREG] = SREG_write;
-            $display("writing into status flag: %16b", SREG_write);
-        end
+        // if(flag_update) begin
+        //     registers[`SREG] = SREG_write;
+        //     $display("writing into status flag: %16b", SREG_write);
+        // end
     end
 
     // always @(posedge reg_write_done) begin
