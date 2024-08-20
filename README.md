@@ -10,6 +10,7 @@ Load program into memory by running ```./cpu/conv.py```
 **Instruction Types:**
 
 - 5 bit opcode + 3 bit register 1 + 3 bit register 2
+- 5 bit opcode + 3 bit register + 16 bit immediate
 - 5 bit opcode + 16 bit immediate
 
 **Instruction set:**
