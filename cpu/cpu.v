@@ -5,13 +5,10 @@
 `include "execute.v"
 
 module cpu(
-    clk,
-    cycles
+    input clk,
+    input [`WORD-1:0] cycles
 );
-
-    input clk;
-    input [`WORD-1:0] cycles;
-    
+  
     reg fetch_tr, dne_tr, reg_tr, mem_tr, PC_fetch, PC_wb_tr, reset_tr; // stages and triggers
     reg reg_wb_tr, mem_wb_tr, flag_update_tr;
 
