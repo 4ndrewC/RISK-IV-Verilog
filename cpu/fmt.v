@@ -1,3 +1,6 @@
+`ifndef __FMT__
+`define __FMT__ 
+
 `define PC 3'b000
 `define SREG 3'b001
 `define ra 3'b010
@@ -49,3 +52,4 @@
 `define SLS 5'b11100
 `define SLI 5'b11101
 
+`endif
