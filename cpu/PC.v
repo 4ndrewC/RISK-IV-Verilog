@@ -1,21 +1,15 @@
 `include "fmt.v"
 
 module program_counter(
-    PC_wb_tr,
-    PC_fetch,
-    jump,
-    rjump,
-    jump_loc,
-    jump_inc,
-    location,
-    clk
+    input PC_wb_tr,
+    input PC_fetch,
+    input jump,
+    input rjump,
+    input [`WORD-1:0] jump_loc,
+    input signed [`WORD-1:0] jump_inc,
+    output reg [`WORD-1:0] location,
+    input clk
 );
-
-    input clk;
-    input PC_fetch, PC_wb_tr, jump, rjump;
-    input [`WORD-1:0] jump_loc;
-    input signed [`WORD-1:0] jump_inc;
-    output reg [`WORD-1:0] location;
 
     reg [`WORD-1:0] PC;
 
