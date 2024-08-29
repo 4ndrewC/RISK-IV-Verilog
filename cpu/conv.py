@@ -5,7 +5,7 @@ fmt_map = {}
 
 for f in fmt:
     line = f.split()
-    if len(line)==0 : continue
+    if len(line)<3 : continue
     if "3'" in line[2] or "5'" in line[2]: line[2] = line[2][3:]
     fmt_map[line[1]] = line[2]
 
