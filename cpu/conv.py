@@ -32,6 +32,7 @@ for l in fin:
             reg2 = fmt_map[reg2]
             filler = "00000"
             instr = opcode+reg1+reg2+filler
+            imm = '0'*16
         else: 
             # handle negative numbers
             if int(reg2)<0:
@@ -46,6 +47,7 @@ for l in fin:
             reg1 = fmt_map[reg1]
             filler = "00000000"
             instr = opcode+reg1+filler
+            imm = '0'*16
         else:
             # handle negative number
             if int(reg1)<0:
@@ -59,6 +61,7 @@ for l in fin:
     elif len(line) == 1:
         filler = "00000000000"
         instr = opcode+filler
+        imm = '0'*16
     
     fout.write(instr+'\n')
     if len(imm)>0: fout.write(imm+'\n')
