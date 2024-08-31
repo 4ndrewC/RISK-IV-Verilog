@@ -14,7 +14,9 @@ module cpu(
 
     // PC variables
     wire jump, rjump, PC_done, PC_fetch_done;
-    wire [`WORD-1:0] jump_loc, PC;
+    wire [`WORD-1:0] jump_loc;
+    // wire [`WORD-1:0] PC;
+    reg [`WORD-1:0] PC;
     wire signed [`WORD-1:0] jump_inc;
 
     // memory and register variables
@@ -34,16 +36,16 @@ module cpu(
     wire reg_write_en, mem_write_en, flag_update_en;
 
 
-    program_counter pc_inst(
-        .PC_wb_tr(PC_wb_tr),
-        .PC_fetch(PC_fetch),
-        .jump(jump),
-        .rjump(rjump),
-        .jump_loc(jump_loc),
-        .jump_inc(jump_inc),
-        .location(PC),
-        .clk(clk)
-    );
+    // program_counter pc_inst(
+    //     .PC_wb_tr(PC_wb_tr),
+    //     .PC_fetch(PC_fetch),
+    //     .jump(jump),
+    //     .rjump(rjump),
+    //     .jump_loc(jump_loc),
+    //     .jump_inc(jump_inc),
+    //     .location(PC),
+    //     .clk(clk)
+    // );
 
     mem mem_inst(
         .re(mem_read),
@@ -110,24 +112,31 @@ module cpu(
     // syncing PC write back after all other write backs
     reg [2:0] write_backs, written;
     reg execute_finished, check_wb;
+    reg stall;
 
     always @(posedge clk) begin
-        if(PC_fetch) begin
-            $display("----------------------------");
-            write_backs <= 0;
-            written <= 0;
-            PC_fetch <= 1'b0;
-            fetch_tr <= 1'b1; 
-        end
+        // if(PC_fetch) begin
+        //     $display("----------------------------");
+        //     write_backs <= 0;
+        //     written <= 0;
+        //     PC_fetch <= 1'b0;
+        //     fetch_tr <= 1'b1; 
+        // end
         if(fetch_tr) begin
+            $display("----------------------------");
             $display("PC fetch location: %0d", PC);
             fetch_tr <= 1'b0;
             reg_tr <= 1'b1;
+            write_backs = 0;
+            written = 0;
+            stall <= 1'b0;
         end
         if(reg_tr) begin
             $display("current instruction: %16b\n", instr);
             reg_tr <= 1'b0;
             dne_tr <= 1'b1;
+            PC <= PC + 2;
+            // $display("written: ", written);
         end
         if(dne_tr) begin
             /* After decode and execute, do all necessary write backs
@@ -138,6 +147,7 @@ module cpu(
             execute_finished <= 1'b1;
         end
         if(check_wb) begin // sync write backs
+            // $display("CYCLES: %0d", cycles);
             check_wb <= 1'b0;
             if(reg_write_en) begin
                 reg_wb_tr <= 1'b1;
@@ -151,8 +161,25 @@ module cpu(
                 flag_update_tr <= 1'b1;
                 write_backs <= write_backs + 1;
             end
+            if(jump | rjump) begin
+                // $display("CYCLES NOW: %0d", cycles);
+                // $display("PC write back\n");
+                PC_wb_tr <= 1'b1;
+                write_backs <= write_backs + 1;
+            end
+            $display("\nClock cycles: %0d\n", cycles);
+            PC_fetch <= 1'b1;
+            if(opcode!=`JMP && opcode!=`RJMP && opcode!=`BREQ) begin
+                fetch_tr <= 1'b1;
+                written <= 0;
+            end
+            else begin
+                stall <= 1'b1;
+                // $display("stalling\n");
+            end
         end
         if(reg_wb_tr) begin
+            // $display("cycles at reg %0d", cycles);
             written <= written + 1;
             reg_wb_tr <= 1'b0;
         end
@@ -161,28 +188,53 @@ module cpu(
             mem_wb_tr <= 1'b0;
         end
         if(flag_update_tr) begin
+            // $display("cycles at flag: %0d", cycles);
             written <= written + 1;
             flag_update_tr <= 1'b0;
         end
-        // reg/mem write backs before PC write back/increment
-        if(written==write_backs & execute_finished) begin
-            $display("number of write backs: %0d", write_backs);
-            $display("number written: %0d", written);
-            PC_wb_tr <= 1'b1;
-            execute_finished <= 1'b0;
-        end   
         if(PC_wb_tr) begin
-            $display("\nClock cycles: %0d\n", cycles);
+            // $display("cycles at PC wb: %0d", cycles);
+            written <= written + 1;
             PC_wb_tr <= 1'b0;
-            PC_fetch <= 1'b1;
-            // execute_finished <= 1'b0;
-        end    
+            if(jump) PC <= jump_loc*2;
+            else if(rjump) begin
+                PC <= PC + jump_inc*2-2;
+                // $display("here");
+            end
+            // $display(reg_wb_tr);
+            // $display(mem_wb_tr);
+            // $display(flag_update_tr);
+            // $display(write_backs);
+            // $display(written);
+        end
+        if(written==write_backs & write_backs!=0 & stall) begin
+            $display("stalling\n");
+            fetch_tr <= 1'b1;
+        end
+        // reg/mem write backs before PC write back/increment
+        // if(written==write_backs & write_backs!=0 & execute_finished) begin
+        //     $display("CYCLES HERE: %0d", cycles);
+        //     $display("number of write backs: %0d", write_backs);
+        //     $display("number written: %0d", written);
+        //     $display("\nClock cycles: %0d\n", cycles);
+        //     // PC_wb_tr <= 1'b1;
+        //     execute_finished <= 1'b0;
+        //     // PC_fetch <= 1'b1;
+        // end   
+        // if(PC_wb_tr) begin
+            
+        //     PC_wb_tr <= 1'b0;
+        //     PC_fetch <= 1'b1;
+        //     // execute_finished <= 1'b0;
+        // end    
     end
 
     // always @(posedge dne_done) $monitor("%1b", reg_wb_tr);
 
     initial begin
-        PC_fetch <= 1'b1;
+        // PC_fetch <= 1'b1;
+        fetch_tr <= 1'b1;
+        PC <= 0;
     end
     
 
