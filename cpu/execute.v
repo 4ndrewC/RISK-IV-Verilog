@@ -64,6 +64,7 @@ module execute(
             reg_wb      = 1'b0;
             mem_wb      = 1'b0;
             jump        = 1'b0;
+            rjump       = 1'b0;
             flag_update = 1'b0;
             
             if(opcode<=5'b01011) begin // ALU instructions
@@ -95,9 +96,12 @@ module execute(
                 end
                 $display("Zero flag: %0d", res==0);
                 
-                if(has_imm) PC_jump_inc = 2;
-                else PC_jump_inc = 1;
+                // if(has_imm) begin
+                //     PC_jump_inc = 2;
+                // end
+                // else PC_jump_inc = 1;
                 flag_update = 1'b1;
+                // rjump = 1'b1;
             end
             else if(opcode>=5'b10100) begin // flag modification instructions
                 case (opcode)
@@ -112,7 +116,8 @@ module execute(
                     // `SLS: SREG_out[`Sf] = 1'b1;
                     `SLI: SREG_out[`If] = 1'b1;
                 endcase
-                PC_jump_inc = 1;
+                // rjump = 1'b1;
+                // PC_jump_inc = 1;
                 flag_update = 1'b1;
             end
             else begin // other instructions
@@ -121,20 +126,23 @@ module execute(
                         reg_write_code <= reg1_code;
                         reg_write_val <= imm;
                         reg_wb = 1'b1;
-                        PC_jump_inc = 2;
+                        // PC_jump_inc = 2;
+                        // rjump = 1'b1;
                     end
                     `LDA: begin
                         reg_write_code <= reg1_code;
                         reg_write_val <= mem_read_data;
                         reg_wb = 1'b1;
-                        PC_jump_inc = 2;
+                        // PC_jump_inc = 2;
+                        // rjump = 1'b1;
                     end
                     `LDW: begin
                         // $display("LDW instruction");
                         mem_write_addr <= imm;
                         mem_write_val <= reg1_input_data;
                         mem_wb = 1'b1;
-                        PC_jump_inc = 2;
+                        // PC_jump_inc = 2;
+                        // rjump = 1'b1;
                     end
                     `JMP: begin
                         PC_jump_loc = imm;
@@ -144,13 +152,15 @@ module execute(
                     `RJMP: begin
                         // $display("RJMP");
                         PC_jump_inc = imm;
+                        rjump = 1'b1;
                     end
                     `MOV: begin
                         // $display("MOV EXECUTED");
                         reg_write_code <= reg1_code;
                         reg_write_val <= reg2_input_data;
                         reg_wb = 1'b1;
-                        PC_jump_inc = 1;
+                        // PC_jump_inc = 1;
+                        // rjump = 1'b1;
                     end
                     `BREQ: begin
                         if(SREG_in[`Zf]) begin
@@ -161,18 +171,18 @@ module execute(
                         end
                         else begin
                             $display("don't branch");
-                            PC_jump_inc = 2;
+                            // PC_jump_inc = 2;
                         end
                     end
                     `CLR: begin
                         reg_write_code <= reg1_code;
                         reg_write_val <= 0;
                         reg_wb = 1'b1;
-                        PC_jump_inc = 2;
+                        // PC_jump_inc = 2;
+                        // rjump = 1'b1;
                     end
                 endcase
             end
-            rjump = 1'b1;
         end
     end
 
