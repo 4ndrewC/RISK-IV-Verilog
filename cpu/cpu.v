@@ -169,14 +169,15 @@ module cpu(
             end
             $display("\nClock cycles: %0d\n", cycles);
             PC_fetch <= 1'b1;
-            if(opcode!=`JMP && opcode!=`RJMP && opcode!=`BREQ) begin
-                fetch_tr <= 1'b1;
-                written <= 0;
-            end
-            else begin
-                stall <= 1'b1;
-                // $display("stalling\n");
-            end
+            // if(opcode!=`JMP && opcode!=`RJMP && opcode!=`BREQ) begin
+            //     fetch_tr <= 1'b1;
+            //     written <= 0;
+            // end
+            // else begin
+            //     stall <= 1'b1;
+            //     // $display("stalling\n");
+            // end
+            stall <= 1'b1;
         end
         if(reg_wb_tr) begin
             // $display("cycles at reg %0d", cycles);
